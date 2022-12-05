@@ -3,6 +3,7 @@ module Hadoo.Lanes where
 import Web.Scotty
 import Hadoo.HtmlUtils
 import Hadoo.State
+import Hadoo.Persistance
 
 
 showLanes :: ActionM ()
@@ -16,10 +17,12 @@ createlane :: State -> Html
 createlane state = ea "div" [("class", "lane")] (unwords [ea "div" [("class", "title")] (show state), unwords (createItems state)])
 
 createItems :: State -> [Html]
-createItems state = map (createItem state) [1..10]
+createItems state = map (createItem state) [1..3]
 
 createItem :: State -> Int -> Html
-createItem state id = ea "div" [("class", "item")] (show state ++ show id ++ itemButtons state id)
+createItem state id = do 
+    items <- getItemByState state
+    ea "div" [("class", "item")] (show state ++ show id ++ itemButtons state id)
 
 itemButtons :: State -> Int -> Html
 itemButtons state id

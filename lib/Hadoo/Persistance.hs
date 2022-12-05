@@ -1,15 +1,21 @@
-module Hadoo.Persistance where 
+module Hadoo.Persistance where
 
 import Web.Scotty
 import qualified Data.Text.Lazy as LT
 import Control.Monad.IO.Class (liftIO)
 import System.Directory (listDirectory, doesDirectoryExist, createDirectory, doesFileExist, renameFile, removeFile)
+import Hadoo.State (State)
+import Hadoo.HtmlUtils
 
-getTodo :: ActionM ()
-getTodo = do
-    let filepath = listDirectory "data/Done"
-    
-    htmlString "test"
+getDirectoryPath :: State -> FilePath
+getDirectoryPath state = "data/" ++ show state
 
-htmlString :: String -> ActionM ()
-htmlString = html . LT.pack
+getItemByState :: State -> IO [(String, String)]
+getItemByState state = do
+    filepath <- listDirectory (getDirectoryPath state)
+    mapM readItem filepath
+
+readItem ::  FilePath -> IO (String, String)
+readItem path = do
+    content <- readFile path
+    return (path, content)
