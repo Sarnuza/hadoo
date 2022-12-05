@@ -1,18 +1,18 @@
-module HtmlUtils where
+module Hadoo.HtmlUtils where
 
-import Web.Scotty 
+import Web.Scotty
 import qualified Data.Text.Lazy as LT
 import Data.List (intersperse)
-
-htmlString :: String -> ActionM ()
-htmlString = html . LT.pack
 
 -- | Type Alias für Html Strings
 type Html = String
 
+htmlString :: String -> ActionM ()
+htmlString = html . LT.pack
+
 -- | Erzeugt ein Element ohne Attribute
 e :: String -> Html -> Html
-e tag kids = ea tag [] kids
+e tag = ea tag []
 
 -- | Erzeugt ein Element mit Attributen
 ea :: String -> [(String, String)] -> Html -> Html
