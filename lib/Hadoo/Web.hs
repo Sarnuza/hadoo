@@ -6,7 +6,6 @@ import Web.Scotty
 import Network.Wai.Middleware.RequestLogger (logStdoutDev)
 import Control.Monad.IO.Class (liftIO)
 import qualified Data.Text.Lazy as LT
-import Data.List (intersperse)
 import Hadoo.Lanes (showLanes)
 import Hadoo.HtmlUtils
 
@@ -39,7 +38,8 @@ demoPageAction = do
 
 indexAction :: ActionM () 
 indexAction = do
-            showLanes
+    lanes <- liftIO showLanes
+    htmlString lanes
             
 newPageAction :: ActionM ()
 newPageAction = do

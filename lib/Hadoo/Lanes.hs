@@ -4,25 +4,36 @@ import Web.Scotty
 import Hadoo.HtmlUtils
 import Hadoo.State
 import Hadoo.Persistance
+import Control.Monad.IO.Class (liftIO)
 
 
-showLanes :: ActionM ()
-showLanes = htmlString $ "<!DOCTYPE html> <html lang='en'> <!-- Styles importieren --> <head><link rel='stylesheet' href='styles.css'> </link></head>" ++ ea "div" [("class", "container")] (unwords createLanes)
 
-createLanes :: [Html]
+showLanes :: IO Html
+showLanes = do
+  lanes <- createLanes
+  return ("<!DOCTYPE html> <html lang='en'> <!-- Styles importieren --> <head><link rel='stylesheet' href='styles.css'> </link></head>" ++ ea "div" [("class", "container")] (unwords lanes))
+
+createLanes :: IO [Html]
 createLanes = do
-    map createlane (enumFromTo minBound maxBound)
+    mapM createlane (enumFromTo minBound maxBound)
 
-createlane :: State -> Html
-createlane state = ea "div" [("class", "lane")] (unwords [ea "div" [("class", "title")] (show state), unwords (createItems state)])
+createlane :: State -> IO Html
+createlane state = do
+  items <- createItems state
+  return (ea "div" [("class", "lane")] (unwords [ea "div" [("class", "title")] (show state), items]))
 
-createItems :: State -> [Html]
-createItems state = map (createItem state) [1..3]
+createItems :: State -> IO Html
+createItems state = do createItem state
 
-createItem :: State -> Int -> Html
-createItem state id = do 
+createItem :: State -> IO Html
+createItem state = do
     items <- getItemByState state
-    ea "div" [("class", "item")] (show state ++ show id ++ itemButtons state id)
+    let htmlItems = map (itemHtml state) items
+    return (unwords htmlItems)
+    
+
+itemHtml :: State ->  (String, String) -> Html
+itemHtml state (a, b) = ea "div" [("class", "item")] (b ++ show state ++ show 0 ++ itemButtons state 0)
 
 itemButtons :: State -> Int -> Html
 itemButtons state id
